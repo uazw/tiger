@@ -12,9 +12,9 @@ and create `server.js`:
 ```
 let { tiger } = require("tiger-server")
 
-let tg = tiger();
+let tg = tiger(`${__dirname}/modules`);
 
-tg.serve(`${__dirname}/modules`);
+tg.serve();
 ```
 
 `modules/hello.js`:

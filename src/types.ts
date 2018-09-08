@@ -29,13 +29,22 @@ export interface StateManager {
 
 export interface TigerModule {
   name: string,
-  moduleDef?: TigerModuleDef;
+  moduleDef: TigerModuleDef;
 }
 
 export interface ModuleRegistry {
   update(module: string, moduleDef: TigerModuleDef): TigerModule;
   unload(module: string): TigerModule;
   valid(module: string): boolean;
+  retrieve(module: string): TigerModule;
+}
+
+export interface ModuleLoader {
+  load(module: string, force?: boolean): LoaderResult
+}
+
+export interface LoaderConfig {
+  basePath: string
 }
 
 export type LoaderResult = { status: boolean, path: string }

@@ -2,6 +2,6 @@
 
 let { tiger } = require ("../lib/index")
 
-let tg = tiger();
+let tg = tiger(`${__dirname}/modules`);
 
-tg.serve(`${__dirname}/modules`);
+tg.serve();

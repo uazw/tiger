@@ -1,9 +1,10 @@
 
-import {Tiger, TigerModule, State, LoaderResult} from "./types"
+import {Tiger, TigerModule, State, LoaderResult, StateManager} from "./types"
 
 import express = require("express");
 import log4js = require("log4js")
 import fs = require("fs")
+import { DefaultStateManager } from "./StateManager";
 
 const DEFAULT_SERVER_PORT = 9527;
 
@@ -16,13 +17,15 @@ export default class TigerServer implements Tiger {
 
   triggers: { [key: string]: TigerModule | undefined } = {}
 
-  db: { [key: string]: State } = {}
-
   serverPort?: number;
+
+  stateManager: StateManager;
 
   constructor() {
     LOGGER.info("Creating a new TigerServer instance");
     this.server = express();
+    this.stateManager = new DefaultStateManager;
+    this.stateManager.mount(this.server);
   }
 
   serve(basePath: string) {
@@ -60,10 +63,6 @@ export default class TigerServer implements Tiger {
       response.send(result);
     });
 
-    this.server.get("/state/:module", (request, response) => {
-      response.send(this.state(request.params["module"]));
-    });
-
     this.server.listen(this.serverPort || DEFAULT_SERVER_PORT);
   }
 
@@ -75,11 +74,11 @@ export default class TigerServer implements Tiger {
     this.serverPort = port;
   }
 
-  private state(moduleName: string, value?: State): State | undefined {
+  private state(moduleName: string, value?: State): State {
     if (value) {
-      this.db[moduleName] = value
+      return this.stateManager.set(moduleName, value);
     }
-    return this.db[moduleName]
+    return this.stateManager.get(moduleName);
   }
 
   private loadModules(basePath: string, path: string, force?: boolean): LoaderResult {

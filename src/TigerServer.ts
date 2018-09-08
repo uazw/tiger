@@ -1,5 +1,5 @@
 
-import {Tiger, TigerMethod, TigerModule, State, LoaderResult} from "./types"
+import {Tiger, TigerModule, State, LoaderResult} from "./types"
 
 import express = require("express");
 import log4js = require("log4js")

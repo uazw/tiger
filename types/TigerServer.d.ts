@@ -1,10 +1,8 @@
-import { Tiger, TigerModule, StateManager } from "./types";
+import { Tiger, StateManager, ModuleRegistry } from "./types";
 import express = require("express");
 export default class TigerServer implements Tiger {
     server: express.Express;
-    triggers: {
-        [key: string]: TigerModule | undefined;
-    };
+    moduleRegistry: ModuleRegistry;
     serverPort?: number;
     stateManager: StateManager;
     constructor();

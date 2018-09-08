@@ -1,10 +1,11 @@
 
-import {Tiger, TigerModule, State, LoaderResult, StateManager} from "./types"
+import {Tiger, TigerModuleDef, State, LoaderResult, StateManager, ModuleRegistry} from "./types"
 
 import express = require("express");
 import log4js = require("log4js")
 import fs = require("fs")
 import { DefaultStateManager } from "./StateManager";
+import { DefaultModuleRegistry } from "./ModuleRegistry";
 
 const DEFAULT_SERVER_PORT = 9527;
 
@@ -15,7 +16,7 @@ export default class TigerServer implements Tiger {
 
   server: express.Express;
 
-  triggers: { [key: string]: TigerModule | undefined } = {}
+  moduleRegistry: ModuleRegistry
 
   serverPort?: number;
 
@@ -25,6 +26,7 @@ export default class TigerServer implements Tiger {
     LOGGER.info("Creating a new TigerServer instance");
     this.server = express();
     this.stateManager = new DefaultStateManager;
+    this.moduleRegistry = new DefaultModuleRegistry;
     this.stateManager.mount(this.server);
   }
 
@@ -48,9 +50,9 @@ export default class TigerServer implements Tiger {
         this.loadModules(basePath, file);
       } else if (file.match(/.*\.js$/)) {
         LOGGER.info(`Unload module ${file}`);
-        this.triggers[file] = undefined;
+        this.moduleRegistry.unload(file);
       }
-    })
+    });
 
     this.server.post("/loader", (request, response) => {
       let {path} = request.body;
@@ -81,32 +83,32 @@ export default class TigerServer implements Tiger {
     return this.stateManager.get(moduleName);
   }
 
-  private loadModules(basePath: string, path: string, force?: boolean): LoaderResult {
+  private loadModules(basePath: string, module: string, force?: boolean): LoaderResult {
     let status = true;
-    let servedPath = `/modules/${path}`;
+    let servedPath = `/modules/${module}`;
     try {
-      let mod: TigerModule = require(`${basePath}/${path}`);
+      let mod: TigerModuleDef = require(`${basePath}/${module}`);
       
-      this.triggers[path] = mod;
+      this.moduleRegistry.update(module, mod)
 
-      if (force || !this.state(path)) {
-        this.state(path, mod.state || {});
+      if (force || !this.state(module)) {
+        this.state(module, mod.state || {});
       }
       
       LOGGER.info(`Mounting module on ${servedPath}`);
       this.server[mod.method](servedPath, (request, response) => {
-        if (!this.triggers[path]) {
-          response.status(404).send({error: `module ${path} no longer valid`});
+        if (!this.moduleRegistry.valid(module)) {
+          response.status(404).send({error: `module ${module} no longer valid`});
           return;
         }
-        let state = this.state(path);
+        let state = this.state(module);
         LOGGER.info(`Handle request on ${servedPath}`);
         mod.handler(request, response, state);
         LOGGER.info(`Request ${servedPath} processed successfully`);
-        this.state(path, state);
+        this.state(module, state);
       });
     } catch (e) {
-      LOGGER.error(`Error found when loading module ${path}: ${e}`, e);
+      LOGGER.error(`Error found when loading module ${module}: ${e}`, e);
       status = false;
     }
 

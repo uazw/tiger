@@ -3,7 +3,7 @@ import express = require("express");
 export default class TigerServer implements Tiger {
     server: express.Express;
     triggers: {
-        [key: string]: TigerModule;
+        [key: string]: TigerModule | undefined;
     };
     db: {
         [key: string]: State;

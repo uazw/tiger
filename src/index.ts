@@ -10,8 +10,7 @@ export type TigerModule = types.TigerModule;
 export interface State extends types.State {}
 
 export function tiger(fn?: (tiger: Tiger) => void): Tiger {
-    let tiger = new TigerServer();
-    if (fn) fn(tiger);
-    return tiger;
+  let tiger = new TigerServer();
+  if (fn) fn(tiger);
+  return tiger;
 }
-

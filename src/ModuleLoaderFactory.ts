@@ -2,29 +2,28 @@ import { StateManager, LoaderConfig, TigerModuleDef, ModuleRegistry, Server, Loa
 
 import * as log4js from "log4js";
 
-import Executor from "./ExecutorFactory"
+import ExecutorFactory from "./ExecutorFactory"
 
 const LOGGER = log4js.getLogger("ModuleLoader");
 LOGGER.level = "info";
 
-export default (stateManager: StateManager,
-  loaderConfig: LoaderConfig,
-  moduleRegistry: ModuleRegistry,
-  server: Server) => {
+export default (stm: StateManager, cfg: LoaderConfig, registry: ModuleRegistry, server: Server) => {
+  LOGGER.info("Creating new module loader");
+  
   return (module: string, force: boolean = false): LoaderResult => {
     let path = `/modules/${module}`;
     let status = true
     try {
-      let moduleDef: TigerModuleDef = require(`${loaderConfig.basePath}/${module}`);
+      let moduleDef: TigerModuleDef = require(`${cfg.basePath}/${module}`);
 
-      moduleRegistry.update(module, moduleDef)
+      registry.update(module, moduleDef)
 
       if (force) {
-        stateManager(module, moduleDef.state || {});
+        stm(module, moduleDef.state || {});
       }
 
       LOGGER.info(`Mounting module on ${path}`);
-      server[moduleDef.method](path, Executor(path, module, stateManager, moduleRegistry));
+      server[moduleDef.method](path, ExecutorFactory(path, module, stm, registry));
       LOGGER.info(`Mounted module on ${path}`);
 
     } catch (e) {

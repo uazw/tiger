@@ -11,5 +11,6 @@ export interface TriggerModule {
 export interface Tiger {
     serve(basePath: string): void;
     config(configurer: (express: express.Express) => void): void;
+    port(port: number): void;
 }
 export declare function tiger(fn?: (tiger: Tiger) => void): Tiger;

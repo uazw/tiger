@@ -17,6 +17,7 @@ export interface TriggerModule {
 export interface Tiger {
     serve(basePath: string): void
     config(configurer: (express: express.Express) => void): void
+    port(port: number): void
 }
 
 const LOGGER: log4js.Logger = log4js.getLogger("TigerServer");
@@ -24,12 +25,13 @@ LOGGER.level = "info";
 
 class TigerServer implements Tiger {
 
-
     server: express.Express;
 
     triggers: { [key: string]: TriggerModule } = {}
 
     db: { [key: string]: State } = {}
+
+    serverPort?: number;
 
     constructor() {
         LOGGER.info("Creating a new TigerServer instance");
@@ -50,7 +52,7 @@ class TigerServer implements Tiger {
         this.server.post("/loader", (request, response) => {
             let {path} = request.body;
             
-            let result = this.loadModules(basePath, path);
+            let result = this.loadModules(basePath, path, request.params.force);
 
             response.send(result);
         });
@@ -59,11 +61,15 @@ class TigerServer implements Tiger {
             response.send(this.state(request.params["module"]));
         });
 
-        this.server.listen(9527)
+        this.server.listen(this.serverPort || 9527)
     }
 
     config(configurer: (express: express.Express) => void) {
         configurer(this.server);
+    }
+
+    port(port: number) {
+        this.serverPort = port;
     }
 
     private state(moduleName: string, value?: State): State | undefined {
@@ -73,7 +79,7 @@ class TigerServer implements Tiger {
         return this.db[moduleName]
     }
 
-    private loadModules(basePath: string, path: string): { status: boolean, path: string } {
+    private loadModules(basePath: string, path: string, force?: boolean): { status: boolean, path: string } {
         let status = true;
         let servedPath = `/modules/${path}`;
         try {
@@ -81,7 +87,7 @@ class TigerServer implements Tiger {
             
             this.triggers[servedPath] = mod;
 
-            if (!this.state(path)) {
+            if (force || !this.state(path)) {
                 this.state(path, mod.state || {});
             }
 

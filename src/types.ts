@@ -21,11 +21,7 @@ export interface Tiger {
   port(port: number): void
 }
 
-export interface StateManager {
-  set(key: string, value: State): State
-  get(key: string): State
-  mount(server: Server): void
-}
+export type StateManager = (key: string, value?: State) => State
 
 export interface TigerModule {
   name: string,
@@ -39,9 +35,7 @@ export interface ModuleRegistry {
   retrieve(module: string): TigerModule;
 }
 
-export interface ModuleLoader {
-  load(module: string, force?: boolean): LoaderResult
-}
+export type ModuleLoader = (module: string, force?: boolean) => LoaderResult;
 
 export interface LoaderConfig {
   basePath: string

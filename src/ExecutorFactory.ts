@@ -13,10 +13,10 @@ export default (path: string, module: string, stateManager: StateManager, module
     }
     
     let { moduleDef } = moduleRegistry.retrieve(module);
-    let state = stateManager.get(module);
+    let state = stateManager(module);
     LOGGER.info(`Handle request on ${path}`);
     moduleDef.handler(req, res, state);
     LOGGER.info(`Request ${path} processed successfully`);
-    stateManager.set(module, state);
+    stateManager(module, state);
   }
 }

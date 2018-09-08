@@ -1,51 +1,35 @@
 
-import {Tiger, TigerModuleDef, State, LoaderResult, StateManager, ModuleRegistry, ModuleLoader, LoaderConfig} from "./types"
-
 import express = require("express");
 import log4js = require("log4js")
 import fs = require("fs")
-import { DefaultStateManager } from "./StateManager";
+import StateManager from "./StateManager";
 import { DefaultModuleRegistry } from "./ModuleRegistry";
-import { DefaultModuleLoader } from "./ModuleLoader";
+import DefaultModuleLoader from "./ModuleLoaderFactory";
 
 const DEFAULT_SERVER_PORT = 9527;
 
 const LOGGER: log4js.Logger = log4js.getLogger("TigerServer");
 LOGGER.level = "info";
 
-export default class TigerServer implements Tiger {
+export default (basePath: string, serverPort?: number, configurer?: (express: express.Express) => void) => {
+  LOGGER.info("Creating a new TigerServer instance");
+  LOGGER.info(`Served in path: ${basePath}`);
+  let server = express();
+  let moduleRegistry = new DefaultModuleRegistry;
+  let loaderConfig = { basePath };
+  let moduleLoader =
+    DefaultModuleLoader(StateManager, loaderConfig, moduleRegistry, server);
 
-  server: express.Express;
+  if (configurer) configurer(server);
 
-  moduleRegistry: ModuleRegistry
+  fs.readdir(basePath, (err, files) => {
+    files.forEach(file => {
+      LOGGER.info(`Preload module: [${file}]`)
+      moduleLoader(file);
+    });
+  })
 
-  serverPort?: number;
-
-  stateManager: StateManager;
-  moduleLoader: ModuleLoader;
-
-  loaderConfig: LoaderConfig = { basePath: "./" }
-
-  constructor(basePath: string) {
-    LOGGER.info("Creating a new TigerServer instance");
-    LOGGER.info(`Served in path: ${basePath}`);
-    this.server = express();
-    this.stateManager = new DefaultStateManager;
-    this.moduleRegistry = new DefaultModuleRegistry;
-    this.stateManager.mount(this.server);
-    this.loaderConfig.basePath = basePath;
-    this.moduleLoader = 
-      new DefaultModuleLoader(this.stateManager, this.loaderConfig, this.moduleRegistry, this.server);
-  }
-
-  serve() {
-    let basePath = this.loaderConfig.basePath
-    fs.readdir(basePath, (err, files) => {
-      files.forEach(file => {
-        LOGGER.info(`Preload module: [${file}]`)
-        this.moduleLoader.load(file);
-      });
-    })
+  return () => {
 
     fs.watch(basePath, (evt, file) => {
       let fullPath = `${basePath}/${file}`;
@@ -53,21 +37,13 @@ export default class TigerServer implements Tiger {
 
       if (file.match(/.*\.js$/) && fs.existsSync(fullPath)) {
         LOGGER.info(`Loading module ${file} automatically`);
-        this.moduleLoader.load(file);
+        moduleLoader(file);
       } else if (file.match(/.*\.js$/)) {
         LOGGER.info(`Unload module ${file}`);
-        this.moduleRegistry.unload(file);
+        moduleRegistry.unload(file);
       }
     });
 
-    this.server.listen(this.serverPort || DEFAULT_SERVER_PORT);
-  }
-
-  config(configurer: (express: express.Express) => void) {
-    configurer(this.server);
-  }
-
-  port(port: number) {
-    this.serverPort = port;
+    server.listen(serverPort || DEFAULT_SERVER_PORT);
   }
 }

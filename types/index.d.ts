@@ -5,4 +5,4 @@ export declare type TigerMethod = types.TigerMethod;
 export declare type TigerModule = types.TigerModuleDef;
 export interface State extends types.State {
 }
-export declare function tiger(basePath: string, fn?: (tiger: Tiger) => void): Tiger;
+export declare function tiger(): any;

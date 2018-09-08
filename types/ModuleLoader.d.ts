@@ -6,5 +6,4 @@ export declare class DefaultModuleLoader implements ModuleLoader {
     server: Server;
     constructor(stateManager: StateManager, loaderConfig: LoaderConfig, moduleRegistry: ModuleRegistry, server: Server);
     load(module: string, force?: boolean): LoaderResult;
-    mount(): void;
 }

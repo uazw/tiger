@@ -1,7 +1,3 @@
-import { StateManager, State, Server } from "./types";
-export declare class DefaultStateManager implements StateManager {
-    state: State;
-    set(key: string, value: State): State;
-    get(key: string): State;
-    mount(server: Server): void;
-}
+import { State } from "./types";
+declare const _default: (key: string, value?: State | undefined) => State;
+export default _default;

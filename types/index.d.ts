@@ -1,16 +1,8 @@
-import express = require("express");
-export declare type State = {
-    [key: string]: State | any;
-};
-export declare type TriggerMethods = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "all";
-export interface TriggerModule {
-    method: TriggerMethods;
-    state?: State;
-    handler: (req: express.Request, res: express.Response, state?: State) => boolean;
+import * as types from "./types";
+export interface Tiger extends types.Tiger {
 }
-export interface Tiger {
-    serve(basePath: string): void;
-    config(configurer: (express: express.Express) => void): void;
-    port(port: number): void;
+export declare type TigerMethod = types.TigerMethod;
+export declare type TigerModule = types.TigerModule;
+export interface State extends types.State {
 }
 export declare function tiger(fn?: (tiger: Tiger) => void): Tiger;

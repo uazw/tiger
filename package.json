@@ -1,7 +1,7 @@
 {
-  "name": "trigger",
-  "version": "1.0.0",
-  "description": "don't pull it",
+  "name": "tiger-server",
+  "version": "0.1.0",
+  "description": "Even simple than trigger",
   "main": "lib/index.js",
   "repository": "https://github.com/kenpusney/trigger",
   "author": "Kimmy Leo",
@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@types/express": "^4.16.0",
-    "@types/log4js": "^2.3.5",
     "@types/pouchdb": "^6.3.2"
-  }
+  },
+  "types": "./types/index.d.ts"
 }

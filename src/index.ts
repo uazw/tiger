@@ -10,7 +10,7 @@ export type TriggerMethods = "get" | "put" | "post" | "delete" | "options" | "he
 
 export interface TriggerModule {
     method: TriggerMethods,
-    state: State,
+    state?: State,
     handler: (req: express.Request, res: express.Response, state?: State) => boolean
 }
 
@@ -82,7 +82,7 @@ class TigerServer implements Tiger {
             this.triggers[servedPath] = mod;
 
             if (!this.state(path)) {
-                this.state(path, mod.state);
+                this.state(path, mod.state || {});
             }
 
             this.server[mod.method](servedPath, (request, response) => {

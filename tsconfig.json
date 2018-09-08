@@ -3,7 +3,9 @@
         "watch": true,
         "target": "es5",
         "outDir": "lib/",
-        "strict": true
+        "strict": true,
+        "declaration": true,
+        "declarationDir": "types"
     },
     "include": [
         "src/**/*.ts"

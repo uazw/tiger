@@ -10,7 +10,7 @@ npm install tiger-server --save
 
 and create `server.js`:
 ```
-let { tiger } = require("trigger-server")
+let { tiger } = require("tiger-server")
 
 let tg = tiger();
 

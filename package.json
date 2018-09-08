@@ -1,0 +1,19 @@
+{
+  "name": "trigger",
+  "version": "1.0.0",
+  "description": "don't pull it",
+  "main": "lib/index.js",
+  "repository": "https://github.com/kenpusney/trigger",
+  "author": "Kimmy Leo",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.3",
+    "log4js": "^3.0.5",
+    "pouchdb": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.0",
+    "@types/log4js": "^2.3.5",
+    "@types/pouchdb": "^6.3.2"
+  }
+}

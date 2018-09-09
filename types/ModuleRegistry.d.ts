@@ -1,24 +1,10 @@
-import { TigerModuleDef, ModuleRegistry, TigerModule, PullModuleDef } from "./types";
-import { ScheduledTask } from "node-cron";
-export declare class DefaultModuleRegistry implements ModuleRegistry<TigerModuleDef> {
+import { ModuleRegistry, TigerModule, ModuleDef } from "./types";
+export declare class DefaultModuleRegistry implements ModuleRegistry {
     modules: {
-        [name: string]: TigerModuleDef;
+        [name: string]: ModuleDef;
     };
-    update(name: string, moduleDef: TigerModuleDef): TigerModule<TigerModuleDef>;
-    unload(name: string): TigerModule<TigerModuleDef>;
+    update(name: string, moduleDef: ModuleDef): TigerModule;
+    unload(name: string): TigerModule;
     valid(name: string): boolean;
-    retrieve(name: string): TigerModule<TigerModuleDef>;
+    retrieve(name: string): TigerModule;
 }
-export declare class PullModuleRegistry implements ModuleRegistry<PullModuleDef> {
-    modules: {
-        [name: string]: PullModuleDef;
-    };
-    workers: {
-        [name: string]: ScheduledTask;
-    };
-    update(name: string, moduleDef: PullModuleDef): TigerModule<PullModuleDef>;
-    unload(name: string): TigerModule<PullModuleDef>;
-    valid(name: string): boolean;
-    retrieve(name: string): TigerModule<PullModuleDef>;
-}
-export declare type ModuleRegistries = [DefaultModuleRegistry, PullModuleRegistry];

@@ -1,6 +1,6 @@
 
 import * as express from "express";
-import { DefaultModuleRegistry } from "./ModuleRegistry";
+import { ScheduledTask } from "node-cron";
 
 export type State = { [key: string]: State | any };
 
@@ -19,8 +19,11 @@ export interface TigerModuleDef {
 export interface PullModuleDef {
   cron: string,
   state?: State,
-  handler: (state?: State) => void
+  handler: (state?: State) => void,
+  _worker?: ScheduledTask
 }
+
+export type ModuleDef = TigerModuleDef | PullModuleDef;
 
 export interface Tiger {
   serve(basePath: string): void
@@ -30,16 +33,16 @@ export interface Tiger {
 
 export type StateManager = (key: string, value?: State) => State
 
-export interface TigerModule<T> {
+export interface TigerModule {
   name: string,
-  moduleDef: T;
+  moduleDef: ModuleDef;
 }
 
-export interface ModuleRegistry<T> {
-  update(module: string, moduleDef: T): TigerModule<T>;
-  unload(module: string): TigerModule<T>;
+export interface ModuleRegistry {
+  update(module: string, moduleDef: ModuleDef): TigerModule;
+  unload(module: string): TigerModule;
   valid(module: string): boolean;
-  retrieve(module: string): TigerModule<T>;
+  retrieve(module: string): TigerModule;
 }
 
 export type ModuleLoader = (module: string, force?: boolean) => LoaderResult;
@@ -49,3 +52,7 @@ export interface LoaderConfig {
 }
 
 export type LoaderResult = { status: boolean, path: string }
+
+export function isTigerModuleDef(moduleDef: TigerModuleDef | PullModuleDef): moduleDef is TigerModuleDef {
+  return (<TigerModuleDef>moduleDef).method !== undefined;
+}

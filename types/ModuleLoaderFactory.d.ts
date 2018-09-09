@@ -1,4 +1,5 @@
 /// <reference types="express" />
 import { StateManager, LoaderConfig, LoaderResult } from "./types";
-declare const _default: (stm: StateManager, cfg: LoaderConfig, registries: [import("./ModuleRegistry").DefaultModuleRegistry, import("./ModuleRegistry").PullModuleRegistry], server: import("express").Express) => (module: string, force?: boolean) => LoaderResult;
+import { DefaultModuleRegistry } from "./ModuleRegistry";
+declare const _default: (stm: StateManager, cfg: LoaderConfig, registry: DefaultModuleRegistry, server: import("express").Express) => (module: string, force?: boolean) => LoaderResult;
 export default _default;

@@ -3,7 +3,7 @@ import express = require("express");
 import log4js = require("log4js")
 import fs = require("fs")
 import stm from "./StateManager";
-import { DefaultModuleRegistry } from "./ModuleRegistry";
+import { DefaultModuleRegistry, ModuleRegistries, PullModuleRegistry } from "./ModuleRegistry";
 import loaderFactory from "./ModuleLoaderFactory";
 
 const DEFAULT_SERVER_PORT = 9527;
@@ -15,9 +15,9 @@ export default (basePath: string, serverPort?: number, configurer?: (express: ex
   LOGGER.info("Creating a new TigerServer instance");
   LOGGER.info(`Served in path: ${basePath}`);
   let server = express();
-  let registry = new DefaultModuleRegistry;
+  let registries: ModuleRegistries = [new DefaultModuleRegistry, new PullModuleRegistry];
   let cfg = { basePath };
-  let moduleLoader = loaderFactory(stm, cfg, registry, server);
+  let moduleLoader = loaderFactory(stm, cfg, registries, server);
 
   if (configurer) configurer(server);
 
@@ -39,7 +39,9 @@ export default (basePath: string, serverPort?: number, configurer?: (express: ex
         moduleLoader(file);
       } else if (file.match(/.*\.js$/)) {
         LOGGER.info(`Unload module ${file}`);
-        registry.unload(file);
+        for (let registry of registries) {
+          registry.unload(file);
+        }
       }
     });
 

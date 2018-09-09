@@ -1,5 +1,6 @@
 
 import * as express from "express";
+import { DefaultModuleRegistry } from "./ModuleRegistry";
 
 export type State = { [key: string]: State | any };
 
@@ -15,6 +16,12 @@ export interface TigerModuleDef {
   handler: (req: Request, res: Response, state?: State) => boolean
 }
 
+export interface PullModuleDef {
+  cron: string,
+  state?: State,
+  handler: (state?: State) => void
+}
+
 export interface Tiger {
   serve(basePath: string): void
   config(configurer: (server: Server) => void): void
@@ -23,16 +30,16 @@ export interface Tiger {
 
 export type StateManager = (key: string, value?: State) => State
 
-export interface TigerModule {
+export interface TigerModule<T> {
   name: string,
-  moduleDef: TigerModuleDef;
+  moduleDef: T;
 }
 
-export interface ModuleRegistry {
-  update(module: string, moduleDef: TigerModuleDef): TigerModule;
-  unload(module: string): TigerModule;
+export interface ModuleRegistry<T> {
+  update(module: string, moduleDef: T): TigerModule<T>;
+  unload(module: string): TigerModule<T>;
   valid(module: string): boolean;
-  retrieve(module: string): TigerModule;
+  retrieve(module: string): TigerModule<T>;
 }
 
 export type ModuleLoader = (module: string, force?: boolean) => LoaderResult;

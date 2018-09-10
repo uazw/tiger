@@ -10,20 +10,23 @@ export type Server = express.Express;
 export type Request = express.Request;
 export type Response = express.Response;
 
-export interface TigerModuleDef {
+
+export type ServerRequestHandler = (req: Request, res: Response) => any;
+
+export interface TriggerDef {
   method: TigerMethod,
   state?: State,
   handler: (req: Request, res: Response, state?: State) => boolean
 }
 
-export interface PullModuleDef {
+export interface WorkerDef {
   cron: string,
   state?: State,
   handler: (state?: State) => void,
   _worker?: ScheduledTask
 }
 
-export type ModuleDef = TigerModuleDef | PullModuleDef;
+export type ModuleDef = TriggerDef | WorkerDef;
 
 export interface Tiger {
   serve(basePath: string): void
@@ -36,10 +39,12 @@ export type StateManager = (key: string, value?: State) => State
 export interface TigerModule {
   name: string,
   moduleDef: ModuleDef;
+  valid: boolean;
+  destroy(): void
 }
 
 export interface ModuleRegistry {
-  update(module: string, moduleDef: ModuleDef): TigerModule;
+  update(module: string, moduleDef: TigerModule): TigerModule;
   unload(module: string): TigerModule;
   valid(module: string): boolean;
   retrieve(module: string): TigerModule;
@@ -51,8 +56,8 @@ export interface LoaderConfig {
   basePath: string
 }
 
-export type LoaderResult = { status: boolean, path: string }
+export type LoaderResult = { status: boolean, module: string }
 
-export function isTigerModuleDef(moduleDef: TigerModuleDef | PullModuleDef): moduleDef is TigerModuleDef {
-  return (<TigerModuleDef>moduleDef).method !== undefined;
+export function isTigerModuleDef(moduleDef: TriggerDef | WorkerDef): moduleDef is TriggerDef {
+  return (<TriggerDef>moduleDef).method !== undefined;
 }

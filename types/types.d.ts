@@ -7,18 +7,19 @@ export declare type TigerMethod = "get" | "put" | "post" | "delete" | "options" 
 export declare type Server = express.Express;
 export declare type Request = express.Request;
 export declare type Response = express.Response;
-export interface TigerModuleDef {
+export declare type ServerRequestHandler = (req: Request, res: Response) => any;
+export interface TriggerDef {
     method: TigerMethod;
     state?: State;
     handler: (req: Request, res: Response, state?: State) => boolean;
 }
-export interface PullModuleDef {
+export interface WorkerDef {
     cron: string;
     state?: State;
     handler: (state?: State) => void;
     _worker?: ScheduledTask;
 }
-export declare type ModuleDef = TigerModuleDef | PullModuleDef;
+export declare type ModuleDef = TriggerDef | WorkerDef;
 export interface Tiger {
     serve(basePath: string): void;
     config(configurer: (server: Server) => void): void;
@@ -28,9 +29,11 @@ export declare type StateManager = (key: string, value?: State) => State;
 export interface TigerModule {
     name: string;
     moduleDef: ModuleDef;
+    valid: boolean;
+    destroy(): void;
 }
 export interface ModuleRegistry {
-    update(module: string, moduleDef: ModuleDef): TigerModule;
+    update(module: string, moduleDef: TigerModule): TigerModule;
     unload(module: string): TigerModule;
     valid(module: string): boolean;
     retrieve(module: string): TigerModule;
@@ -41,6 +44,6 @@ export interface LoaderConfig {
 }
 export declare type LoaderResult = {
     status: boolean;
-    path: string;
+    module: string;
 };
-export declare function isTigerModuleDef(moduleDef: TigerModuleDef | PullModuleDef): moduleDef is TigerModuleDef;
+export declare function isTigerModuleDef(moduleDef: TriggerDef | WorkerDef): moduleDef is TriggerDef;

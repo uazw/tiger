@@ -1,11 +1,10 @@
 
 import express = require("express");
-import log4js = require("log4js")
-import fs = require("fs")
+import log4js = require("log4js");
+import fs = require("fs");
 import stm from "./StateManager";
 import { DefaultModuleRegistry } from "./ModuleRegistry";
 import loaderFactory from "./ModuleLoaderFactory";
-import moduleUnLoader from "./ModuleUnLoader";
 
 const DEFAULT_SERVER_PORT = 9527;
 
@@ -19,7 +18,6 @@ export default (basePath: string, serverPort?: number, configurer?: (express: ex
   let registry = new DefaultModuleRegistry;
   let cfg = { basePath };
   let moduleLoader = loaderFactory(stm, cfg, registry, server);
-  let unLoader = moduleUnLoader(stm, registry);
 
   if (configurer) configurer(server);
 
@@ -28,23 +26,22 @@ export default (basePath: string, serverPort?: number, configurer?: (express: ex
       LOGGER.info(`Preload module: [${file}]`)
       moduleLoader(file);
     });
-  })
+  });
+  
+  fs.watch(basePath, (evt, file) => {
+    let fullPath = `${basePath}/${file}`;
+    LOGGER.info(`Event '${evt}' found on file '${fullPath}'`);
+
+    if (file.match(/.*\.js$/) && fs.existsSync(fullPath)) {
+      LOGGER.info(`Loading module ${file} automatically`);
+      moduleLoader(file);
+    } else if (file.match(/.*\.js$/)) {
+      LOGGER.info(`Unload module ${file}`);
+      registry.unload(file).destroy();
+    }
+  });
 
   return () => {
-
-    fs.watch(basePath, (evt, file) => {
-      let fullPath = `${basePath}/${file}`;
-      LOGGER.info(`Event '${evt}' found on file '${fullPath}'`);
-
-      if (file.match(/.*\.js$/) && fs.existsSync(fullPath)) {
-        LOGGER.info(`Loading module ${file} automatically`);
-        moduleLoader(file);
-      } else if (file.match(/.*\.js$/)) {
-        LOGGER.info(`Unload module ${file}`);
-        unLoader(file);
-      }
-    });
-
     server.listen(serverPort || DEFAULT_SERVER_PORT);
   }
 }

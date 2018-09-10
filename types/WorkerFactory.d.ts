@@ -1,4 +1,4 @@
-import { StateManager } from "./types";
-import { DefaultModuleRegistry } from "./ModuleRegistry";
-declare const _default: (module: string, stm: StateManager, registry: DefaultModuleRegistry) => () => void;
+import { StateManager, WorkerDef } from "./types";
+import { Worker } from "./Modules";
+declare const _default: (module: string, workerDef: WorkerDef, stm: StateManager) => Worker;
 export default _default;

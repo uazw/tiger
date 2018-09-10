@@ -1,4 +1,5 @@
 import * as express from "express";
+import { ScheduledTask } from "node-cron";
 export declare type State = {
     [key: string]: State | any;
 };
@@ -11,6 +12,13 @@ export interface TigerModuleDef {
     state?: State;
     handler: (req: Request, res: Response, state?: State) => boolean;
 }
+export interface PullModuleDef {
+    cron: string;
+    state?: State;
+    handler: (state?: State) => void;
+    _worker?: ScheduledTask;
+}
+export declare type ModuleDef = TigerModuleDef | PullModuleDef;
 export interface Tiger {
     serve(basePath: string): void;
     config(configurer: (server: Server) => void): void;
@@ -19,10 +27,10 @@ export interface Tiger {
 export declare type StateManager = (key: string, value?: State) => State;
 export interface TigerModule {
     name: string;
-    moduleDef: TigerModuleDef;
+    moduleDef: ModuleDef;
 }
 export interface ModuleRegistry {
-    update(module: string, moduleDef: TigerModuleDef): TigerModule;
+    update(module: string, moduleDef: ModuleDef): TigerModule;
     unload(module: string): TigerModule;
     valid(module: string): boolean;
     retrieve(module: string): TigerModule;
@@ -35,3 +43,4 @@ export declare type LoaderResult = {
     status: boolean;
     path: string;
 };
+export declare function isTigerModuleDef(moduleDef: TigerModuleDef | PullModuleDef): moduleDef is TigerModuleDef;

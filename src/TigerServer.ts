@@ -5,6 +5,7 @@ import fs = require("fs")
 import stm from "./StateManager";
 import { DefaultModuleRegistry } from "./ModuleRegistry";
 import loaderFactory from "./ModuleLoaderFactory";
+import moduleUnLoader from "./ModuleUnLoader";
 
 const DEFAULT_SERVER_PORT = 9527;
 
@@ -18,6 +19,7 @@ export default (basePath: string, serverPort?: number, configurer?: (express: ex
   let registry = new DefaultModuleRegistry;
   let cfg = { basePath };
   let moduleLoader = loaderFactory(stm, cfg, registry, server);
+  let unLoader = moduleUnLoader(stm, registry);
 
   if (configurer) configurer(server);
 
@@ -39,7 +41,7 @@ export default (basePath: string, serverPort?: number, configurer?: (express: ex
         moduleLoader(file);
       } else if (file.match(/.*\.js$/)) {
         LOGGER.info(`Unload module ${file}`);
-        registry.unload(file);
+        unLoader(file);
       }
     });
 

@@ -1,18 +1,18 @@
 
-import {TigerModuleDef, ModuleRegistry, TigerModule} from "./types"
-
+import { ModuleRegistry, TigerModule, ModuleDef } from "./types"
 export class DefaultModuleRegistry implements ModuleRegistry {
 
-  modules: { [name: string]: TigerModuleDef } = {}
+  modules: { [name: string]: ModuleDef } = {}
 
-  update(name: string, moduleDef: TigerModuleDef): TigerModule {
+  update(name: string, moduleDef: ModuleDef): TigerModule {
     this.modules[name] = moduleDef;
     return { name, moduleDef }
-  }  
+  }
+
   unload(name: string): TigerModule {
     let moduleDef = this.modules[name];
     delete this.modules[name];
-    return {name, moduleDef}
+    return { name, moduleDef }
   }
 
   valid(name: string): boolean {
@@ -21,7 +21,6 @@ export class DefaultModuleRegistry implements ModuleRegistry {
 
   retrieve(name: string): TigerModule {
     let moduleDef = this.modules[name];
-    return {name, moduleDef}
+    return { name, moduleDef }
   }
-
 }

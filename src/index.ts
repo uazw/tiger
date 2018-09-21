@@ -5,7 +5,9 @@ import * as types from "./types"
 
 export interface Tiger extends types.Tiger {}
 export type TigerMethod = types.TigerMethod;
-export type TigerModule = types.TigerModuleDef;
+
+export type TriggerDef = types.TriggerDef;
+export type WorkerDef = types.WorkerDef;
 
 export interface State extends types.State {}
 

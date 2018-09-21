@@ -1,6 +1,6 @@
 {
   "name": "tiger-server",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "description": "Even simple than trigger",
   "main": "lib/index.js",
   "repository": "https://github.com/kenpusney/tiger",
@@ -17,5 +17,10 @@
     "@types/pouchdb": "^6.3.2",
     "@types/node-cron": "^1.2.0"
   },
+  "files": [
+    "lib/**/*.js",
+    "src/**/*.ts",
+    "types/**/*.ts"
+  ],
   "types": "./types/index.d.ts"
 }

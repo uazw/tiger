@@ -1,19 +1,20 @@
-import { StateManager, PullModuleDef } from "./types";
+import { StateManager, WorkerDef } from "./types";
 
 import * as log4js from "log4js";
-import { DefaultModuleRegistry } from "./ModuleRegistry";
+import { Worker } from "./Modules";
+import { schedule } from "node-cron";
 
 const LOGGER = log4js.getLogger("Worker");
 LOGGER.level = "info";
 
-
-export default (module: string, stm: StateManager, registry: DefaultModuleRegistry) => {
-    return () => {
-        let { moduleDef } = registry.retrieve(module);
-        let state = stm(module);
-        LOGGER.info(`${module} is running`);
-        (moduleDef as PullModuleDef).handler(state);
-        LOGGER.info(`${module} is done`);
-        stm(module, state);
-    }
+export default (module: string, workerDef: WorkerDef, stm: StateManager): Worker => {
+    let worker = new Worker(module, workerDef);
+    worker.task(schedule(workerDef.cron, () => {
+      let state = stm(module);
+      LOGGER.info(`${module} is running`);
+      worker.moduleDef.handler(state);
+      LOGGER.info(`${module} is done`);
+      stm(module, state);
+    }));
+    return worker; 
 }

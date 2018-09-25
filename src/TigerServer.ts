@@ -22,11 +22,13 @@ export default (basePath: string, serverPort?: number, configurer?: (express: ex
   if (configurer) configurer(server);
 
   fs.readdir(basePath, (err, files) => {
-    files.forEach(file => {
-      LOGGER.info(`Preload module: [${file}]`)
-      moduleLoader(file);
-    });
-  });
+    files
+      .filter(file => file.match(/.*\.js$/))
+      .forEach(file => {
+        LOGGER.info(`Preload module: [${file}]`)
+        moduleLoader(file);
+      });
+  })
   
   fs.watch(basePath, (evt, file) => {
     let fullPath = `${basePath}/${file}`;

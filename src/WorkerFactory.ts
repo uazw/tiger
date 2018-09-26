@@ -12,9 +12,15 @@ export default (module: string, workerDef: WorkerDef, stm: StateManager): Worker
     worker.task(schedule(workerDef.cron, () => {
       let state = stm(module);
       LOGGER.info(`${module} is running`);
-      let result = worker.moduleDef.handler(state);
+      try {
+        let newState = {...state}
+        let result = worker.moduleDef.handler(newState);
+        stm(module, { ...newState, ...result })
+      } catch (e) {
+        LOGGER.error(`Error occured when run module ${module}: ${e}`);
+      }
       LOGGER.info(`${module} is done`);
-      stm(module, { ...state, ...result });
+      ;
     }));
     return worker; 
 }

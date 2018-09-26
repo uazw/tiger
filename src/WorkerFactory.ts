@@ -12,9 +12,9 @@ export default (module: string, workerDef: WorkerDef, stm: StateManager): Worker
     worker.task(schedule(workerDef.cron, () => {
       let state = stm(module);
       LOGGER.info(`${module} is running`);
-      worker.moduleDef.handler(state);
+      let result = worker.moduleDef.handler(state);
       LOGGER.info(`${module} is done`);
-      stm(module, state);
+      stm(module, { ...state, ...result });
     }));
     return worker; 
 }

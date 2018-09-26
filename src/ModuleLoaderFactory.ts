@@ -18,7 +18,7 @@ export default (stm: StateManager, cfg: LoaderConfig, registry: DefaultModuleReg
     let status = true
     try {
       let moduleDef: ModuleDef = require(`${cfg.basePath}/${module}`);
-
+      stm(module, moduleDef.state);
       LOGGER.info(`Mounting a module as ${module}`)        
       if (isTigerModuleDef(moduleDef)) {
         let trigger = registry.update(module, TriggerFactory( module, moduleDef, stm));

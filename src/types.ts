@@ -16,13 +16,13 @@ export type ServerRequestHandler = (req: Request, res: Response) => any;
 export interface TriggerDef {
   method: TigerMethod,
   state?: State,
-  handler: (req: Request, res: Response, state?: State) => boolean
+  handler: (req: Request, res: Response, state?: State) => State
 }
 
 export interface WorkerDef {
   cron: string,
   state?: State,
-  handler: (state?: State) => void,
+  handler: (state?: State) => State,
   _worker?: ScheduledTask
 }
 

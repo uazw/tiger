@@ -17,9 +17,9 @@ export default (module: string, triggerDef: TriggerDef, stm: StateManager): Trig
     
     let state = stm(module);
     LOGGER.info(`Handle request for ${module}`);
-    trigger.moduleDef.handler(req, res, state);
+    let result = trigger.moduleDef.handler(req, res, state);
     LOGGER.info(`Request for ${module} processed successfully`);
-    stm(module, state);
+    stm(module, { ...state, ...result });
   });
   return trigger;
 }

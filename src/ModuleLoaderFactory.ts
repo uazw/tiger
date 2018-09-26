@@ -21,7 +21,7 @@ export default (stm: StateManager, cfg: LoaderConfig, registry: DefaultModuleReg
       stm(module, moduleDef.state);
       LOGGER.info(`Mounting a module as ${module}`)        
       if (isTigerModuleDef(moduleDef)) {
-        let trigger = registry.update(module, TriggerFactory( module, moduleDef, stm));
+        let trigger = registry.update(module, TriggerFactory(module, moduleDef, stm));
         trigger.mountOn((n, h) => server[trigger.moduleDef.method](`/modules/${n}`, h));
       } else {
         let worker = registry.update(module, WorkerFactory(module, moduleDef, stm));

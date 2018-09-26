@@ -1,8 +1,9 @@
 
 module.exports = {
     cron: "*/5 * * * * *",
-    state: {},
-    handler: () => {
-      console.log('hlle  ado');
+    state: {count: 0},
+    handler: ({count}) => {
+      console.log(`${count++}`);
+      return {count}
     }
 }

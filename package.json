@@ -7,7 +7,6 @@
   "author": "Kimmy Leo",
   "license": "MIT",
   "dependencies": {
-    "@imqueue/core": "^1.3.17",
     "express": "^4.16.3",
     "log4js": "^3.0.5",
     "node-cron": "^1.2.0",

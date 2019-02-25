@@ -10,22 +10,28 @@ npm install tiger-server --save
 
 and create `server.js`:
 ```
-let { tiger } = require("tiger-server")
 
-let tg = tiger(`${__dirname}/modules`);
+const tiger = require("tiger-server")()
 
-tg();
+
+tiger.load("hello", ["zmq:hello", function (tiger, state, message) {
+  tiger.log(`Message received: ${JSON.stringify(message)}`)
+}])
+
+
+tiger.load("cron", ["cron:*/5 * * * * *", function (tiger, { count = 0 }) {
+  count++;
+  tiger.notify("zmq:hello", { count })
+  return { count }
+}]);
+
+tiger.load("request", ["http:/hello", function (tiger, state, { req, res }) {
+  tiger.notify("zmq:hello", { message: "request recieved" });
+
+  res.send("success!")
+}])
+
+tiger.serve();
 ```
 
-`modules/hello.js`:
-```
-module.exports = {
-    method: "get",
-    state: {},
-    handler: (req, res) => {
-        res.send("hello world");
-    } 
-}
-```
-
-Just run `node server.js` then you can now visit your module via https://localhost:9527/modules/hello.js
+Just run `node server.js` then you can now see these modules interactions.

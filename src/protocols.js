@@ -1,0 +1,89 @@
+const zeromq = require("zeromq")
+
+const nodeCron = require("node-cron")
+
+const express = require("express")
+
+
+const processWithMutableState = function(tiger, processor, id, param) {
+  const state = tiger.state(id)
+
+  const result = processor(tiger, state, param)
+
+  tiger.state(id, Object.assign({}, state, result));
+}
+
+const zmq = function(tiger) {
+
+  const publisher = zeromq.socket("pub")
+  publisher.bindSync("tcp://0.0.0.0:9528")
+
+  const subscribe = function(topic) {
+    const subscriber = zeromq.socket("sub")
+    subscriber.subscribe(topic)
+    subscriber.connect("tcp://0.0.0.0:9528")
+    return subscriber;
+  }
+
+  const resolver = {
+    define(path, id, processor, tiger) {
+      const sub = subscribe(path)
+      sub.on("message", (topicBuf, messageBuf) => {
+        const topic = topicBuf.toString();
+        if (topic === path) {
+          const message = JSON.parse(messageBuf.toString())
+          processWithMutableState(tiger, processor, id, message)  
+        } else {
+          tiger.log(`Skipped with inexact match ${topic} of ${path}`)
+        }
+      });
+    },
+
+    notify(target, param) {
+      tiger.log(`Notifiying Queue ${target} with param ${param}`)
+      publisher.send([target.toString(), JSON.stringify(param)])
+    }
+  }
+
+  tiger.register("zmq", resolver)
+}
+
+const cron = function(tiger) {
+  const resolver = {
+    define(path, id, processor, tiger) {
+      nodeCron.schedule(path, function() {
+        processWithMutableState(tiger, processor, id, {});
+      })
+    },
+
+    notify(target, param) {
+    }
+  }
+
+  tiger.register("cron", resolver)
+}
+
+const http = function(tiger) {
+
+  const server = express()
+
+  const resolver = {
+    define(path, id, processor, tiger) {
+      server.get(path, (req, res) => {
+        processWithMutableState(tiger, processor, id, {req, res})
+      })
+    },
+    notify(target, param) {
+    }
+  }
+
+  tiger.register("http", resolver)
+
+  tiger.serve = function() {
+    server.listen(9527)
+  }
+}
+
+module.exports = {
+  zmq, cron, http
+}

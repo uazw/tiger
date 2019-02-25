@@ -1,0 +1,67 @@
+const { getLogger } = require("log4js");
+
+function Tiger(config) {
+  this.config = config
+  this.plugins = {}
+  this.tigs = {}
+
+  this.resolvers = {}
+  this._state = {}
+
+  this.logger = getLogger("tiger");
+  this.logger.level = "INFO"
+}
+
+Tiger.prototype.use = function(plugin) {
+  plugin(this)
+}
+
+Tiger.prototype.load = function(id, handler) {
+  this.tigs[id] = handler
+
+  const target = handler[0]
+  const processor = handler[1]
+  const targetDef = target.split(":");
+  const protocol = targetDef[0]
+  const path = targetDef[1]
+
+  this.resolvers[protocol].define(path, id, processor, this);
+}
+
+Tiger.prototype.log = function(log, scope) {
+  this.logger.info(`${scope ? scope + " -- " : ""}${log}`);
+  return this;
+}
+
+Tiger.prototype.error = function(log, scope) {
+  this.logger.error(`${scope ? scope + " -- " : ""}${log}`);
+  return this;
+}
+
+Tiger.prototype.notify = function(target, param) {
+  this.log(`Notifying target: ${target} with param ${param}`)
+
+  const targetDef = target.split(":")
+  const protocol = targetDef[0];
+  const path = targetDef[1]
+
+  this.resolvers[protocol].notify(path, param, this);
+}
+
+Tiger.prototype.register = function(protocol, resolver) {
+  this.resolvers[protocol] = resolver;
+}
+
+Tiger.prototype.state = function(key, value) {
+  if (value) {
+    this._state[key] = value
+  } else {
+    return this._state[key] || {}
+  }
+}
+
+Tiger.prototype.serve = function() {
+  
+}
+
+module.exports = Tiger

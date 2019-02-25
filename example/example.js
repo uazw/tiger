@@ -1,17 +1,5 @@
-# tiger-server
 
-Tiger server is a very lightweight server for very simple process like webhooks.
-
-## Usage
-
-```
-npm install tiger-server --save
-```
-
-and create `server.js`:
-```
-
-const tiger = require("tiger-server")()
+const tiger = require("../src/index")()
 
 
 tiger.load("hello", ["zmq:hello", function (tiger, state, message) {
@@ -32,6 +20,3 @@ tiger.load("request", ["http:/hello", function (tiger, state, { req, res }) {
 }])
 
 tiger.serve();
-```
-
-Just run `node server.js` then you can now see these modules interactions.

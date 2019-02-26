@@ -56,9 +56,6 @@ const cron = function(tiger) {
       nodeCron.schedule(path, function() {
         processWithMutableState(tiger, processor, id, {});
       })
-    },
-
-    notify(target, param) {
     }
   }
 
@@ -74,8 +71,6 @@ const http = function(tiger) {
       server.get(path, (req, res) => {
         processWithMutableState(tiger, processor, id, {req, res})
       })
-    },
-    notify(target, param) {
     }
   }
 
@@ -100,9 +95,6 @@ const mail = function(tiger) {
   const transport = mailer.createTransport(config.transport);
 
   const resolver = {
-    define() {
-    },
-
     notify(target, param) {
       const options = Object.assign({}, { from: config.sender, to: target }, param);
 

@@ -25,7 +25,13 @@ Tiger.prototype.define = function(id, handler) {
   const protocol = targetDef[0]
   const path = targetDef[1]
 
-  this.resolvers[protocol].define(path, id, processor, this);
+  const resolver = this.resolvers[protocol]
+
+  if (resolver && resolver.define) {
+    resolver.define(path, id, processor, this);
+  } else {
+    this.logger.warn(`No valid definition handler found for protocol [${protocol}]`)
+  }
 }
 
 Tiger.prototype.log = function(log, scope) {
@@ -45,7 +51,13 @@ Tiger.prototype.notify = function(target, param) {
   const protocol = targetDef[0];
   const path = targetDef[1]
 
-  this.resolvers[protocol].notify(path, param, this);
+  const resolver = this.resolvers[protocol]
+
+  if (resolver && resolver.notify) {
+    resolver.notify(path, param, this)
+  } else {
+    this.logger.warn(`No valid notification handler found for protocol [${protocol}]`)
+  }
 }
 
 Tiger.prototype.register = function(protocol, resolver) {

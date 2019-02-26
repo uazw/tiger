@@ -18,17 +18,17 @@ const tiger = require("../src/index")({
 
 tiger.use(mail)
 
-tiger.load("hello", ["zmq:hello", function (tiger, state, message) {
+tiger.define("hello", ["zmq:hello", function (tiger, state, message) {
   tiger.log(`Message received: ${JSON.stringify(message)}`)
 }])
 
-tiger.load("cron", ["cron:*/5 * * * * *", function (tiger, { count = 0 }) {
+tiger.define("cron", ["cron:*/5 * * * * *", function (tiger, { count = 0 }) {
   count++;
   tiger.notify("zmq:hello", { count })
   return { count }
 }]);
 
-tiger.load("request", ["http:/hello", function (tiger, state, { req, res }) {
+tiger.define("request", ["http:/hello", function (tiger, state, { req, res }) {
 
   tiger.notify("mail:someone@another.com", { subject: "hello", text: "hello world", html: "<p>hello world</p>" });
 

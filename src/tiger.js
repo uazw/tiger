@@ -16,7 +16,7 @@ Tiger.prototype.use = function(plugin) {
   plugin(this)
 }
 
-Tiger.prototype.load = function(id, handler) {
+Tiger.prototype.define = function(id, handler) {
   this.tigs[id] = handler
 
   const target = handler[0]

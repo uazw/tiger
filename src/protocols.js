@@ -4,6 +4,8 @@ const nodeCron = require("node-cron")
 
 const express = require("express")
 
+const mailer = require("nodemailer")
+
 
 const processWithMutableState = function(tiger, processor, id, param) {
   const state = tiger.state(id)
@@ -84,6 +86,33 @@ const http = function(tiger) {
   }
 }
 
+
+const mail = function(tiger) {
+
+
+  const config = tiger.config.mail;
+
+  if (!config || !config.transport) {
+    tiger.error("No proper email config found, exit!", "mail protocol")
+    process.exit(-1)
+  }
+
+  const transport = mailer.createTransport(config.transport);
+
+  const resolver = {
+    define() {
+    },
+
+    notify(target, param) {
+      const options = Object.assign({}, { from: config.sender, to: target }, param);
+
+      transport.sendMail(options)
+    }
+  }
+
+  tiger.register("mail", resolver)
+}
+
 module.exports = {
-  zmq, cron, http
+  zmq, cron, http, mail
 }

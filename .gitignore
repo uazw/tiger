@@ -5,3 +5,4 @@ types/
 *.tgz
 .nyc_output/
 coverage/
+.data/

@@ -1,20 +1,36 @@
 
-const tiger = require("../src/index")()
+const { mail } = require("../src/protocols")
 
+const tiger = require("../src/index")({
+  mail: {
+    sender: "email@example.com",
+    transport: {
+      host: "some.smtp.server.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "email@example.com",
+        pass: "password"
+      }
+    }
+  }
+})
 
-tiger.load("hello", ["zmq:hello", function (tiger, state, message) {
+tiger.use(mail)
+
+tiger.define("hello", ["zmq:hello", function (tiger, state, message) {
   tiger.log(`Message received: ${JSON.stringify(message)}`)
 }])
 
-
-tiger.load("cron", ["cron:*/5 * * * * *", function (tiger, { count = 0 }) {
+tiger.define("cron", ["cron:*/5 * * * * *", function (tiger, { count = 0 }) {
   count++;
   tiger.notify("zmq:hello", { count })
   return { count }
 }]);
 
-tiger.load("request", ["http:/hello", function (tiger, state, { req, res }) {
-  tiger.notify("zmq:hello", { message: "request recieved" });
+tiger.define("request", ["http:/hello", function (tiger, state, { req, res }) {
+
+  tiger.notify("mail:someone@another.com", { subject: "hello", text: "hello world", html: "<p>hello world</p>" });
 
   res.send("success!")
 }])

@@ -28,7 +28,7 @@ Tiger.prototype.define = function(id, handler) {
   const resolver = this.resolvers[protocol]
 
   if (resolver && resolver.define) {
-    resolver.define(path, id, processor, this);
+    resolver.define(path, id, processor);
   } else {
     this.logger.warn(`No valid definition handler found for protocol [${protocol}]`)
   }

@@ -28,7 +28,7 @@ const zmq = function(tiger) {
   }
 
   const resolver = {
-    define(path, id, processor, tiger) {
+    define(path, id, processor) {
       const sub = subscribe(path)
       sub.on("message", (topicBuf, messageBuf) => {
         const topic = topicBuf.toString();
@@ -52,7 +52,7 @@ const zmq = function(tiger) {
 
 const cron = function(tiger) {
   const resolver = {
-    define(path, id, processor, tiger) {
+    define(path, id, processor) {
       nodeCron.schedule(path, function() {
         processWithMutableState(tiger, processor, id, {});
       })
@@ -67,7 +67,7 @@ const http = function(tiger) {
   const server = express()
 
   const resolver = {
-    define(path, id, processor, tiger) {
+    define(path, id, processor) {
       server.get(path, (req, res) => {
         processWithMutableState(tiger, processor, id, {req, res})
       })

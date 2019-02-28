@@ -117,13 +117,13 @@ Here is required configurations:
 
 #### Attribute
 
-| Attributes    	| Value                             	|
-|---------------	|-----------------------------------	|
-| Stateless     	| Y                                 	|
-| Message       	| Y                                 	|
-| Messge Format 	| { from, to, subject, text, html } 	|
-| `define`?     	| N                                 	|
-| `notify`?     	| Y                                 	|
+| Attributes    	| Value                             	  |
+|---------------	|-------------------------------------	|
+| Stateless     	| Y                                 	  |
+| Message       	| Y                                 	  |
+| Messge Format 	| `{ from, to, subject, text, html }` 	|
+| `define`?     	| N                                 	  |
+| `notify`?     	| Y                                 	  |
 
 #### Example
 

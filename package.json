@@ -2,7 +2,7 @@
   "name": "tiger-server",
   "version": "0.3.0",
   "description": "Even simple than trigger",
-  "main": "src/index.js",
+  "main": "index.js",
   "repository": "https://github.com/kenpusney/tiger",
   "author": "Kimmy Leo",
   "license": "MIT",
@@ -13,8 +13,5 @@
     "nodemailer": "^5.1.1",
     "pouchdb": "^7.0.0",
     "zeromq": "^5.1.0"
-  },
-  "files": [
-    "src/**/*.js"
-  ]
+  }
 }
